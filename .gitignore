@@ -20,3 +20,4 @@ __pycache__/
 # IDE - specific directories
 .idea/
 .vscode/
+.vs/
