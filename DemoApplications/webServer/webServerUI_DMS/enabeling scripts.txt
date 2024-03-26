@@ -1,3 +1,0 @@
-cd ~/webServerUI
-chmod +x enable-scripts.sh
-./enable-scripts.sh
