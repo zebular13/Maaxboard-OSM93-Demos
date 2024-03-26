@@ -1,2 +1,22 @@
-.DS_Store
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Editor-specific files
+*~
+*.swp
+*.swo
+*.bak
+*.pyc
+
+# Environment variables
+.env
 .venv
+
+# macOS specific files
+.DS_Store
+
+# IDE - specific directories
+.idea/
+.vscode/
