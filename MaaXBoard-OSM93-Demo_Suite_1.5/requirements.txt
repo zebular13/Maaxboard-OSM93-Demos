@@ -1,0 +1,13 @@
+ELM327-emulator==3.0.0
+matplotlib==3.7.2
+mediapipe==0.10.8
+microdot==2.0.6
+numpy==1.26.0
+obd==0.7.2
+psutil==6.0.0
+pyserial==3.5
+python-can==4.4.2
+requests==2.31.0
+serial==0.0.97
+tendo==0.3.0
+tflite==2.10.0
