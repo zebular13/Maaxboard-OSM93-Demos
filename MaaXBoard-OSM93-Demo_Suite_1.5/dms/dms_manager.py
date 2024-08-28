@@ -39,6 +39,7 @@ CALL_PENALTY = 2.0
 RESTORE_CREDIT = -5.0
 """ % to restore for doing everything right """
 
+
 class DMSManager:
     def __init__(self, run_on_hardware=False, use_npu=False):
         self.run_on_hardware = run_on_hardware
@@ -56,18 +57,19 @@ class DMSManager:
         self.safe_value = 0
 
         model_selector = model_paths.NPU_MODELS if self.use_npu else model_paths.CPU_MODELS
+        DELEGATE_PATH = "/usr/lib/libethosu_delegate.so" if self.use_npu else None
 
         self.face_detector = FaceDetector(model_path = str(self.path_to_models + model_selector['DETECT_MODEL']), 
-                                          delegate_path = None, 
+                                          delegate_path = DELEGATE_PATH, 
                                           img_size=self.target_dim,
                                           run_on_hardware=self.run_on_hardware)
         
         self.face_mesher = FaceMesher(model_path=str((self.path_to_models + model_selector['LANDMARK_MODEL'])), 
-                                      delegate_path = None,
+                                      delegate_path = DELEGATE_PATH,
                                       run_on_hardware=self.run_on_hardware)
         
         self.eye_mesher = EyeMesher(model_path=str((self.path_to_models + model_selector['EYE_MODEL'])),
-                                    delegate_path = None,
+                                    delegate_path = DELEGATE_PATH,
                                     run_on_hardware=self.run_on_hardware)
 
 
