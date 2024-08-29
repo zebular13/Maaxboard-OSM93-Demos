@@ -4,10 +4,16 @@ import datetime
 
 class CarAttributesHandler:
     """
-    Handler to manager speed, rpm, and other parameters associated with user interaction in the car. 
+    Multithreaded handler to manager speed, and rpm parameters for the car. 
+    Class is a Singleton to aid in being used in localWindow.
 
-    Class is a Singleton so that it can be accessed both in the main CAN loop and GUI end. 
+    Two states are monitored:
+    - acceleratiing
+    - braking
+
+    During car idle, values are kept static. 
     """
+    
     _instance = None
 
     def __new__(cls):
@@ -31,6 +37,11 @@ class CarAttributesHandler:
             callback(self.speed, self.rpm, self.throttle)
 
     def calculate_rpm(self):
+        '''
+        Simulates an RPM value based on speed with 
+        added "shifting" effect when speed passes certain thresholds.
+
+        '''
         if self.accelerating:
             if 0 <= self.speed <= 20:
                 self.rpm = 1400 + (self.speed / 20) * (3500 - 1400)
@@ -51,6 +62,9 @@ class CarAttributesHandler:
                 self.rpm = 5400 - ((100 - self.speed) / 40) * (5400 - 2800)
 
     def accelerate(self):
+        '''
+        Continually increase speed and throttle position during acceleration.
+        '''
         self.accelerating = True
         while self.accelerating and self.speed < 100:
             self.speed += 1
@@ -60,6 +74,9 @@ class CarAttributesHandler:
             time.sleep(0.05)
 
     def brake(self):
+        '''
+        Continually decrease speed and throttle position during acceleration.
+        '''
         self.braking = True
         while self.braking and self.speed > 0:
             self.speed -= 1

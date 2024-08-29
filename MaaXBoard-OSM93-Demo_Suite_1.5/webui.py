@@ -1,19 +1,15 @@
-'''
-webui.py is the Main applictaion script. Options for running the script on MaaXBoard OSM93 or Linux are provided below. 
-'''
+"""
+Main Application Entry Point.
 
-run_on_hardware = False
+This module initializes and runs the main application components including CAN bus management,
+camera support, local window GUI, and a web server. It handles interactions between different
+modules and manages the application's state.
 
-if run_on_hardware == False:
-	HardwareSupport = False
-	RotateCameraY = False
-	RotateCameraX = False
-	EnableUSBPowerMonitor = False
-else:
-	HardwareSupport = True
-	RotateCameraY = False
-	RotateCameraX = True
-	EnableUSBPowerMonitor = True
+Classes:
+    CanDemoManager: Manages CAN bus operations.
+    CameraSupport: Handles camera operations and frame processing.
+    LocalWindow: Manages the GUI elements and user interactions.
+"""
 
 import os
 import sys
@@ -35,6 +31,31 @@ from microdot import Microdot, redirect, send_file
 
 from random import seed
 from random import randint
+
+
+'''
+Options to run application on hardware or separate Linux PC.
+'''
+run_on_hardware = False
+
+if run_on_hardware == False:
+	HardwareSupport = False
+	RotateCameraY = False
+	RotateCameraX = False
+	EnableUSBPowerMonitor = False
+else:
+	HardwareSupport = True
+	RotateCameraY = False
+	RotateCameraX = True
+	EnableUSBPowerMonitor = True
+
+
+
+# Constants
+DEMO_FITNESS = 0
+DEMO_DMS = 1
+DEMO_CAN = 2
+
 
 # will sys.exit(-1) if other instance is running
 me = singleton.SingleInstance()
@@ -59,17 +80,28 @@ def GetFileFullPath(s):
 	return filePath
 
 def frameCallback(frame, demoNumber, ret1, ret2, ret3, ret4, ret5):
+	"""
+    Callback function for processing frames from the camera.
+
+    This function updates the global frame and triggers UI updates based on the current demo.
+
+    Parameters:
+        frame (np.array): The latest frame from the camera.
+        demoNumber (int): The identifier for the current demo.
+        ret1, ret2, ret3, ret4, ret5 (int): Demo-specific return values for UI updates.
+
+    Returns:
+        None
+    """
 	global globalFrame
 	global globalCurrentDemo
 
 	globalFrame = frame
 	window.updateFrame(frame)
 
-	# print("global currnet demo:",globalCurrentDemo)
-
-	if (globalCurrentDemo == 0) and (demoNumber == 0):
+	if (globalCurrentDemo == DEMO_FITNESS) and (demoNumber == DEMO_FITNESS):
 		window.UpdateFitnessUI(ret1, ret2, ret3, ret4)
-	elif globalCurrentDemo == 1 and (demoNumber == 1):
+	elif (globalCurrentDemo == DEMO_DMS) and (demoNumber == DEMO_DMS):
 		window.UpdateDMSUI(ret1, ret2, ret3, ret4, ret5)
 	else:
 		# CAN demo selected, ignore frame callback
@@ -80,18 +112,18 @@ def screenClickCallback(event):
 
 	if event == "event_reset":
 		camera.ResetFitnessApp()
-		globalCurrentDemo = 0
+		globalCurrentDemo = DEMO_FITNESS
 
 	elif event == "page0":
-		globalCurrentDemo = 0
+		globalCurrentDemo = DEMO_FITNESS
 		window.UpdateActiveDemo(globalCurrentDemo)
 
 	elif event == "page1":
-		globalCurrentDemo = 1
+		globalCurrentDemo = DEMO_DMS
 		window.UpdateActiveDemo(globalCurrentDemo)
 
 	elif event == "page2":
-		globalCurrentDemo = 2
+		globalCurrentDemo = DEMO_CAN
 		window.UpdateActiveDemo(globalCurrentDemo)
 
 	elif event == "toggle_DMS_Acceleration":
