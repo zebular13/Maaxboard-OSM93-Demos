@@ -14,6 +14,7 @@ from dms.face_detection import FaceDetector
 from dms.eye_landmark import EyeMesher
 from dms.face_landmark import FaceMesher
 from dms.utils import *
+from dms.inference_timer import InferenceTimeLogger
 
 BAD_FACE_PENALTY = 0.01
 """ % to remove for far away face """
@@ -55,6 +56,7 @@ class DMSManager:
         self.inference_speed = None
         self.face_in_frame = False
         self.safe_value = 0
+        self.inference_logger = InferenceTimeLogger()
 
         model_selector = model_paths.NPU_MODELS if self.use_npu else model_paths.CPU_MODELS
         DELEGATE_PATH = "/usr/lib/libethosu_delegate.so" if self.use_npu else None
@@ -112,12 +114,11 @@ class DMSManager:
         padded = cv2.flip(padded, 3)
 
         # face detection
-        start = time.time()
         bboxes_decoded, landmarks, scores = self.face_detector.inference(padded)
 
-        end = time.time()
-        delta = (end-start)*1000
-        self.inference_speed = "{:.2f}".format(delta)
+        self.inference_logger.calculate_total_model_averages()
+        model_avgs = self.inference_logger.get_models_inf_average()
+        self.inference_speed = "{:.2f}".format(model_avgs*1000)
 
         mesh_landmarks_inverse = []
         r_vecs, t_vecs = [], []
@@ -159,68 +160,42 @@ class DMSManager:
             left_eye_ratio = get_eye_ratio(left_eye_landmarks, image_show, left_box[0])
             right_eye_ratio = get_eye_ratio(right_eye_landmarks, image_show, right_box[0])
 
-            # print("left eye ratio", left_eye_ratio)
-            # print("right eye ratio", right_eye_ratio)
-
-
             pitch, roll, yaw = get_face_angle(r_vec, t_vec)
             iris_ratio = get_iris_ratio(left_iris_landmarks, right_iris_landmarks)
 
             if mouth_ratio > 0.2:
-                #cv2.putText(image_show, "Yawning: Detected", (padded_size[2] + 70, padded_size[0] + 70),
-                #        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.0, color=(255, 0, 0), thickness=2)
                 self.yawning_status = True
                 yawn = True
             else:
-                #cv2.putText(image_show, "Yawning: No", (padded_size[2] + 70, padded_size[0] + 70),
-                #        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.0, color=(0, 255, 0), thickness=2)
                 self.yawning_status = False
                 yawn = False    
 
             if left_eye_ratio < 0.25 and right_eye_ratio < 0.25:
-                #cv2.putText(image_show, "Eye: Closed", (padded_size[2] + 70, padded_size[0] + 100),
-                #        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.0, color=(255, 0, 0), thickness=2)
                 self.eye_status = True
                 sleep = True
             else:
-                #cv2.putText(image_show, "Eye: Open", (padded_size[2] + 70, padded_size[0] + 100),
-                #        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.0, color=(0, 255, 0), thickness=2)
                 self.eye_status = False
                 sleep = False
 
             if yaw > 15 and iris_ratio > 1.15:
-                #cv2.putText(image_show, "Face: Left",(padded_size[2] + 70, padded_size[0] + 130),
-                #    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=[255, 0, 0], thickness=2)
                 self.attention_status = "Left"
                 attention = False
 
             elif yaw < -15 and iris_ratio < 0.85:
-                #cv2.putText(image_show, "Face: Right",(padded_size[2] + 70, padded_size[0] + 130),
-                #    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=[255, 0, 0], thickness=2)
                 self.attention_status = "Right"
                 attention = False
 
             elif pitch > 30:
-                #cv2.putText(image_show, "Face: UP",(padded_size[2] + 70, padded_size[0] + 130),
-                #    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=[255, 0, 0], thickness=2)
                 self.attention_status = "Up"
                 attention = False
 
             elif pitch < -13:
-                #cv2.putText(image_show, "Face: Down",(padded_size[2] + 70, padded_size[0] + 130),
-                #    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=[255, 0, 0], thickness=2)
                 self.attention_status = "Down"
                 attention = False
 
             else:
-                #cv2.putText(image_show, "Face: Forward",(padded_size[2] + 70, padded_size[0] + 130),
-                #    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=[0, 255, 0], thickness=2)
                 self.attention_status = "Forward"
                 attention = True
-
-        # print("attention: ", attention)
-        # print("eyes: ", sleep)
-        # print("yawn: ,", )
         
         if not attention:
             self.safe_value = min(self.safe_value + DISTRACT_PENALTY, 100.00)
@@ -233,10 +208,6 @@ class DMSManager:
         if attention and not self.eye_status and not self.yawning_status:
             # print("credit store")
             self.safe_value = max(self.safe_value + RESTORE_CREDIT, 0.00)
-
-        # print(self.face_in_frame)
-        # print(self.safe_value)
-
 
         # remove pad
         image_show = image_show[padded_size[0]:target_dim - padded_size[1], padded_size[2]:target_dim - padded_size[3]]

@@ -7,12 +7,16 @@
 import math
 import cv2
 import numpy as np
+import time
+from dms.inference_timer import InferenceTimeLogger
 
 
 class FaceMesher:
     FACE_KEY_NUM = 468
 
     def __init__(self, model_path, delegate_path, run_on_hardware=False):
+
+        self.inference_logger = InferenceTimeLogger()
 
         if run_on_hardware:
             import tflite_runtime.interpreter as tflite
@@ -43,7 +47,12 @@ class FaceMesher:
 
         # invoke
         self.interpreter.set_tensor(self.input_idx, input_data)
+        start = time.time()
         self.interpreter.invoke()
+        end = time.time()
+        delta = end-start
+        self.inference_logger.iris_inf_time = delta
+        # print("face landmark inference time:", delta)
         landmarks = self.interpreter.get_tensor(self.outputs_idx['landmark'])
         scores = self.interpreter.get_tensor(self.outputs_idx['score'])
 

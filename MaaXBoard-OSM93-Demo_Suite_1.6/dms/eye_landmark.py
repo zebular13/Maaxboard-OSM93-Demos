@@ -7,6 +7,8 @@
 import math
 import cv2
 import numpy as np
+import time
+from dms.inference_timer import InferenceTimeLogger
 
 
 
@@ -15,6 +17,8 @@ class EyeMesher:
     IRIS_KEY_NUM = 5
 
     def __init__(self, model_path, delegate_path, run_on_hardware=False):
+
+        self.inference_logger = InferenceTimeLogger()
     
         if run_on_hardware:
             import tflite_runtime.interpreter as tflite
@@ -47,7 +51,13 @@ class EyeMesher:
 
         # invoke
         self.interpreter.set_tensor(self.input_idx, image_)
+        start = time.time()
         self.interpreter.invoke()
+        end = time.time()
+        delta = end-start
+        self.inference_logger.face_detection_inf_time = delta
+        # print("IRIS inference time:", delta)
+
         eye_landmarks = self.interpreter.get_tensor(self.outputs_idx['eye'])
         iris_landmarks = self.interpreter.get_tensor(self.outputs_idx['iris'])
 

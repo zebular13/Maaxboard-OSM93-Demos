@@ -16,5 +16,5 @@ sleep 1
 
 echo Starting application
 
-python3 /home/root/MaaXBoard-OSM93-Demo_Suite_1.5/webui.py
+python3 /home/root/MaaXBoard-OSM93-Demo_Suite_1.6/webui.py
 

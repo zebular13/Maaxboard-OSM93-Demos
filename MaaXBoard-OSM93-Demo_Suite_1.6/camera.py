@@ -59,7 +59,6 @@ class cameraSupport():
 		self.FrameGetterThread = threading.Thread(target=self.FrameGetter)
 		self.FrameGetterThread.start()
 		self.enableNPU = False
-		# self.PostureDemo = posture_core(None, False)
 
 	def ResetFitnessApp(self):
 		reset_fitness_app()
@@ -75,7 +74,6 @@ class cameraSupport():
 
 	def close(self):
 		self.running = False
-		# self.PostureDemo.Close(self)
 		self.CloseCVDevice(self)
 
 	def OpenCVDevice(self):
@@ -135,7 +133,7 @@ class cameraSupport():
 								self.frame = newFrame
 								self.callback(self.frame, 1, attention_status, yawning_status, eye_status, inference_speed, penalty_score)
 
-							else:
+							else:	
 								newFrame, attention_status, yawning_status, eye_status, inference_speed, penalty_score = dms_npu.process_frame_dms(image)
 								self.frame = newFrame
 								self.callback(self.frame, 1, attention_status, yawning_status, eye_status, inference_speed, penalty_score)
@@ -152,7 +150,6 @@ class cameraSupport():
 				except:
 					pass
 
-			#time.sleep(0.1)
 
  
 
