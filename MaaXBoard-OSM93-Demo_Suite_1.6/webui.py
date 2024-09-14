@@ -19,8 +19,6 @@ from netinfo import NETInfo
 from camera import cameraSupport
 from localWindow import localWindow
 from tendo import singleton
-from CanTools.car_status import CarStatus
-from CanTools.can_main import CanDemoManager
 
 try:
 	import uasyncio as asyncio
@@ -54,8 +52,6 @@ else:
 # Constants
 DEMO_FITNESS = 0
 DEMO_DMS = 1
-DEMO_CAN = 2
-
 
 # will sys.exit(-1) if other instance is running
 me = singleton.SingleInstance()
@@ -68,9 +64,6 @@ ledStates = [0, 0, 0]
 
 globalFrame = None
 globalCurrentDemo = 0
-
-# Setup Car simulator & can tools
-can_app_manager = CanDemoManager(selectedDemo=globalCurrentDemo)
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 
@@ -122,25 +115,9 @@ def screenClickCallback(event):
 		globalCurrentDemo = DEMO_DMS
 		window.UpdateActiveDemo(globalCurrentDemo)
 
-	elif event == "page2":
-		globalCurrentDemo = DEMO_CAN
-		window.UpdateActiveDemo(globalCurrentDemo)
-
 	elif event == "toggle_DMS_Acceleration":
 		camera.ToggleDMSAcceleration()
 		window.ToggleNPUAccelerationLabel()
-
-	elif event == "car_accelerate":
-		window.UpdateCANUI()
-		can_app_manager.update_car_state(carState=CarStatus.ACCELERATE)
-		
-	elif event == "car_brake":
-		window.UpdateCANUI()
-		can_app_manager.update_car_state(carState=CarStatus.BRAKE)
-
-	elif event == "car_idle":
-		window.UpdateCANUI()
-		can_app_manager.update_car_state(carState=CarStatus.IDLE)
 
 	camera.SwitchDemo(globalCurrentDemo)
 

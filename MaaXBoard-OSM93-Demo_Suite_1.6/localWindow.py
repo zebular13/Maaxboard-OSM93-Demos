@@ -8,7 +8,6 @@ import datetime
 from math import pi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
-from CanTools.car_attributes_handler import CarAttributesHandler
 
 
 scriptFolder = os.path.dirname(__file__)
@@ -39,11 +38,6 @@ class localWindow():
 
 		self.enableNPU = False
 
-		self.car_accelerate = False
-		self.car_brake = True
-		self.car_attributes_handler = CarAttributesHandler()
-		self.car_attributes_handler.add_speed_callback(self.UpdateCarSpeed)
-
 		self.aboutWindow = None
 		self.MainWindow = None
 		self.clickCallback = callback
@@ -61,10 +55,6 @@ class localWindow():
 		global activeDemo
 		activeDemo = demoIndex
 
-	def UpdateCarSpeed(self, speed, rpm, throttle):
-		global carSpeed
-		carSpeed = speed
-
 	def ToggleNPUAccelerationLabel(self):
 		if self.enableNPU == False:
 			self.enableNPU = True
@@ -76,9 +66,6 @@ class localWindow():
 
 	def UpdateDMSUI(self, attention_status, yawning_status, eye_status, inference_speed, penalty_score):
 		GLib.idle_add(self.update_DMSUI_elements, attention_status, yawning_status, eye_status, inference_speed, penalty_score)
-
-	def UpdateCANUI(self):
-		GLib.idle_add(self.update_CANUI_elements)
 
 	def ReportClick(self, event):
 		self.clickCallback(event)
@@ -178,22 +165,6 @@ class localWindow():
 			label5_text = '<span weight="bold" size="xx-large">{}</span>'.format(str("NPU"))
 			label5.set_markup(label5_text)
 
-	def update_CANUI_elements(self):
-		# grab objects
-		gas_pedal_image = GladeBuilder.get_object("gas_pedal")
-		brake_pedal_image = GladeBuilder.get_object("brake_pedal")
-
-		# test for accerlate, brake, or idle
-		if self.car_accelerate == True:
-			gas_pedal_image.set_from_file(scriptFolder + "/resources/gas_shoe.png")
-		elif self.car_brake == True:
-			brake_pedal_image.set_from_file(scriptFolder + "/resources/brake_shoe.png")
-		else:
-			# idle state
-			gas_pedal_image.set_from_file(scriptFolder + "/resources/gas.png")
-			brake_pedal_image.set_from_file(scriptFolder + "/resources/brake.png")
-			
-
 	def localApp(self):
 		global GladeBuilder
 
@@ -208,7 +179,6 @@ class localWindow():
 		self.MainWindow = GladeBuilder.get_object("mainWindow")
 		self.aboutWindow = GladeBuilder.get_object("aboutWindow")
 
-		self.CANdemobutton = GladeBuilder.get_object("CAN_demo_button")
 		self.DMSdemobutton = GladeBuilder.get_object("DMS_demo_button")
 		self.FITdemobutton = GladeBuilder.get_object("FIT_demo_button")
 
@@ -318,30 +288,6 @@ class localWindow():
 
 		def reset_button_clicked_cb(self, widget):
 			self.outer_instance.clickCallback("event_reset")
-
-		def gas_button_pressed_cb(self, widget, event):
-			if event.type == Gdk.EventType.BUTTON_PRESS:
-				self.outer_instance.car_accelerate = True
-				self.outer_instance.car_brake = False
-				self.outer_instance.clickCallback("car_accelerate")
-			
-		def gas_button_released_cb(self, widget, event):
-			if event.type == Gdk.EventType.BUTTON_RELEASE:
-				self.outer_instance.car_accelerate = False
-				self.outer_instance.car_brake = False
-				self.outer_instance.clickCallback("car_idle")
-
-		def brake_button_pressed_cb(self, widget, event):
-			if event.type == Gdk.EventType.BUTTON_PRESS:
-				self.outer_instance.car_accelerate = False
-				self.outer_instance.car_brake = True
-				self.outer_instance.clickCallback("car_brake")
-		
-		def brake_button_released_cb(self, widget, event):
-			if event.type == Gdk.EventType.BUTTON_RELEASE:
-				self.outer_instance.car_accelerate = False
-				self.outer_instance.car_brake = False
-				self.outer_instance.clickCallback("car_idle")
 			
 		def on_demo_select_switch_page(self, notebook, page, page_number):
 			self.UpdateButtonCSS(page_number)
@@ -361,13 +307,13 @@ class localWindow():
 			if page_number == 0:
 				self.outer_instance.FITdemobutton.set_name('menu_button_select')
 				self.outer_instance.DMSdemobutton.set_name('menu_button')
-				self.outer_instance.CANdemobutton.set_name('menu_button')
+			
 			elif page_number == 1:
 				self.outer_instance.FITdemobutton.set_name('menu_button')
 				self.outer_instance.DMSdemobutton.set_name('menu_button_select')
-				self.outer_instance.CANdemobutton.set_name('menu_button')
+				
 			elif page_number == 2:
 				self.outer_instance.FITdemobutton.set_name('menu_button')
 				self.outer_instance.DMSdemobutton.set_name('menu_button')
-				self.outer_instance.CANdemobutton.set_name('menu_button_select')
+				
 				

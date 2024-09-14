@@ -23,8 +23,8 @@ dms_cpu = DMSManager(run_on_hardware=True, use_npu=False)
 dms_npu = DMSManager(run_on_hardware=True, use_npu=True)
 '''
 
-dms_cpu = DMSManager(run_on_hardware=True, use_npu=False)
-dms_npu = DMSManager(run_on_hardware=True, use_npu=True)
+dms_cpu = DMSManager(run_on_hardware=False, use_npu=False)
+dms_npu = DMSManager(run_on_hardware=False, use_npu=True)
 
 class cameraSupport():
 	''' Class for managing camera functionality and callbacks with frame data.

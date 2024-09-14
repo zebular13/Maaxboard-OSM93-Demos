@@ -43,8 +43,8 @@ RESTORE_CREDIT = -5.0
 
 class DMSManager:
     def __init__(self, run_on_hardware=False, use_npu=False):
-        self.run_on_hardware = run_on_hardware
-        self.use_npu = use_npu
+        self.run_on_hardware = False
+        self.use_npu = False
         self.path_to_models = model_paths.MODEL_DIR
         self.face_detector = None
         self.face_mesher = None
