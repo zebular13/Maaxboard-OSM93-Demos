@@ -4,7 +4,7 @@ import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # set as dms directory / models
-model_dir = parent_dir = os.path.join(current_dir, "models/")
+model_dir = parent_dir = os.path.join(current_dir, "models-A1/")
 
 MODEL_DIR = model_dir
 

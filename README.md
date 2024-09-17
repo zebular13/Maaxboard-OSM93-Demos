@@ -1,7 +1,7 @@
 # Maaxboard-OSM93-Demos
 Demo Projects for MaaXBoard OSM93
 
-## MaaXBoard-OSM93-Demo_Suite_1.6
+## MaaXBoard OSM93 Demo Suite
 ### Overview
 Tria developed application suite to explore funtionality of the MaaXBoard OSM93. Multiple applications are included in this project folder including: Web server, CAN interface demo, AI Fitness Trainer, and Driver Monitoring system. 
 
@@ -26,4 +26,6 @@ Tria developed application suite to explore funtionality of the MaaXBoard OSM93.
 - CAN Interface cable (PN: XXXX) - Required for interactive CAN demo.
 - Relevant Python libraries - See requirements.txt
 
+### Demos
+Currently two branches are maintained to support A1 silicon and A0 silicon pieces of hardware. Demo applications are denoted by both version and silicon revision.
 
