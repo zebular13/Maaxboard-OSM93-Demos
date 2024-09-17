@@ -55,7 +55,7 @@ class EyeMesher:
         self.interpreter.invoke()
         end = time.time()
         delta = end-start
-        self.inference_logger.face_detection_inf_time = delta
+        self.inference_logger.iris_inf_time = delta
         # print("IRIS inference time:", delta)
 
         eye_landmarks = self.interpreter.get_tensor(self.outputs_idx['eye'])

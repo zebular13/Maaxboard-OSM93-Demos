@@ -59,6 +59,7 @@ class cameraSupport():
 		self.FrameGetterThread = threading.Thread(target=self.FrameGetter)
 		self.FrameGetterThread.start()
 		self.enableNPU = False
+		# self.PostureDemo = posture_core(None, False)
 
 	def ResetFitnessApp(self):
 		reset_fitness_app()
@@ -74,6 +75,7 @@ class cameraSupport():
 
 	def close(self):
 		self.running = False
+		# self.PostureDemo.Close(self)
 		self.CloseCVDevice(self)
 
 	def OpenCVDevice(self):
@@ -150,6 +152,7 @@ class cameraSupport():
 				except:
 					pass
 
+			#time.sleep(0.1)
 
  
 

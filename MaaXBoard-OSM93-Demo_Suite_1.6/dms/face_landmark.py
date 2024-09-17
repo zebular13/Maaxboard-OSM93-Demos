@@ -51,7 +51,7 @@ class FaceMesher:
         self.interpreter.invoke()
         end = time.time()
         delta = end-start
-        self.inference_logger.iris_inf_time = delta
+        self.inference_logger.face_landmark_inf_time = delta
         # print("face landmark inference time:", delta)
         landmarks = self.interpreter.get_tensor(self.outputs_idx['landmark'])
         scores = self.interpreter.get_tensor(self.outputs_idx['score'])

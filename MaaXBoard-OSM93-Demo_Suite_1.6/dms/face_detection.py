@@ -87,7 +87,7 @@ class FaceDetector:
         self.interpreter.invoke()
         end = time.time()
         delta = end-start
-        self.inference_logger.face_landmark_inf_time = delta
+        self.inference_logger.face_detection_inf_time = delta
         # print("Face detection inference time:", delta)
         scores = self.interpreter.get_tensor(self.outputs_idx['classificators']).squeeze()
         scores = 1 / (1 + np.exp(-scores))

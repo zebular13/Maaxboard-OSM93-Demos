@@ -172,10 +172,10 @@ class localWindow():
 
 
 		if self.enableNPU == False:
-			label5_text = '<span weight="bold" size="xx-large">{}</span>'.format(str("CPU"))
+			label5_text = '<span weight="bold" foreground="#ffff00" size="xx-large">{}</span>'.format(str("CPU"))
 			label5.set_markup(label5_text)
 		else:
-			label5_text = '<span weight="bold" size="xx-large">{}</span>'.format(str("NPU"))
+			label5_text = '<span weight="bold" foreground="#00ff00" size="xx-large">{}</span>'.format(str("NPU"))
 			label5.set_markup(label5_text)
 
 	def update_CANUI_elements(self):
