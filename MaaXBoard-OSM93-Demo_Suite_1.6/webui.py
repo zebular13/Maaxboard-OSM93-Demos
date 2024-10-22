@@ -17,7 +17,7 @@ import json
 import cv2
 from netinfo import NETInfo
 from camera import cameraSupport
-from localWindow import localWindow
+#from localWindow import localWindow
 from tendo import singleton
 
 try:
@@ -215,7 +215,7 @@ def index(request):
 
 camera = cameraSupport(HardwareSupport, frameCallback)
 
-window = localWindow(screenClickCallback)
+#window = localWindow(screenClickCallback)
 
 app.run(debug=True)
 
