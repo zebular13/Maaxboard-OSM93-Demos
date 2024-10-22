@@ -66,23 +66,26 @@ class PoseDetector:
             detections = self.blaze_detector.denormalize_detections(normalized_detections,scale1,pad1)
                 
             xc,yc,scale,theta = self.blaze_detector.detection2roi(detections)
-            roi_img,roi_affine,roi_box = self.blaze_landmark.extract_roi(img1,xc,yc,theta,scale)
+            roi_img,roi_affine,roi_box = self.blaze_landmark.extract_roi(imgRGB,xc,yc,theta,scale)
 
             flags, normalized_landmarks = self.blaze_landmark.predict(roi_img)
             landmarks = self.blaze_landmark.denormalize_landmarks(normalized_landmarks, roi_affine)
 
+            #xmin, ymin =  roi_box[0:1]
             keypoint_list = []
             for i in range(len(flags)):
+                roi_box[i]
                 landmark, flag = landmarks[i], flags[i]
                 h, w, c = frame.shape
                 confidence = 0.8 # landmark.visibility   # Not sure how to get visibility
                 points = landmark[:,:2]
-                points = points[:,:2]
+                #points = points[:,:2]
                 for point in points:
                     x,y = point
-                    cx, cy = int(x * w), int(y*h)
-                    keypoint_list.append([flag, cx, cy, confidence])
-            print(keypoint_list)
+                    cx, cy = int(x), int(y)
+                    #keypoint_list.append([i, cx + xmin, cy + ymin, confidence])
+                    keypoint_list.append([i, cx, cy, confidence])
+            #print(keypoint_list)
         return keypoint_list
 
 class Exercise:
