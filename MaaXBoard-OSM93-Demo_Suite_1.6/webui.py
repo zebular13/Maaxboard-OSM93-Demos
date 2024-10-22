@@ -17,7 +17,7 @@ import json
 import cv2
 from netinfo import NETInfo
 from camera import cameraSupport
-#from localWindow import localWindow
+from localWindow import localWindow
 from tendo import singleton
 
 try:
@@ -140,6 +140,7 @@ async def video_feed(request):
 			while True:
 				if camera.CameraOpen():
 					frame = globalFrame
+					#print(frame)
 					if(frame is not None):
 						_, frame = cv2.imencode('.JPEG', frame)
 						yield (b'--frame\r\n'
@@ -215,7 +216,7 @@ def index(request):
 
 camera = cameraSupport(HardwareSupport, frameCallback)
 
-#window = localWindow(screenClickCallback)
+window = localWindow(screenClickCallback)
 
 app.run(debug=True)
 
