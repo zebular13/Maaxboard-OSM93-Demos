@@ -1,10 +1,18 @@
 import cv2
+import os
 import numpy as np
 import mediapipe as mp
 import math
 import time
 import sys
 
+from timeit import default_timer as timer
+
+from FitnessApp import model_paths
+
+sys.path.append(os.path.abspath('../blaze_common/'))
+from FitnessApp.blazedetector import BlazeDetector
+from FitnessApp.blazelandmark import BlazeLandmark
 
 BICEP_CURL_POINTS = [11,13,15]
 OVERHEAD_PRESSL_POINTS = [11,13,15]
@@ -32,21 +40,49 @@ def init_fitness_app():
 
 class PoseDetector:
     def __init__(self):
-        self.mpPose = mp.solutions.pose
-        self.pose = self.mpPose.Pose()
+        self.run_on_hardware = False
+        self.use_npu = False
+        self.path_to_models = model_paths.MODEL_DIR
+        model_selector = model_paths.NPU_MODELS if self.use_npu else model_paths.CPU_MODELS
+
+        self.default_detector_model='pose_detection_full_quant.tflite'
+        self.default_landmark_model='pose_landmark_full_quant.tflite'
+        self.blaze_detector = BlazeDetector("blazepose")
+
+        self.blaze_detector.set_debug(False)
+        self.blaze_detector.display_scores(False)
+        self.blaze_detector.load_model(model_path = str(self.path_to_models + model_selector['DETECT_MODEL']))
+
+        self.blaze_landmark = BlazeLandmark("blazeposelandmark")
+        self.blaze_landmark.set_debug(False)
+        self.blaze_landmark.load_model(model_path=str((self.path_to_models + model_selector['LANDMARK_MODEL'])))
+
     
     def detect_pose(self, frame):
         # Convert color BGR to RGB for inferencing
         imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = self.pose.process(imgRGB)
-        keypoint_list = []
-        if results.pose_landmarks:
-            for idx, landmark in enumerate(results.pose_landmarks.landmark):
+        img1,scale1,pad1=self.blaze_detector.resize_pad(imgRGB)
+
+        normalized_detections = self.blaze_detector.predict_on_image(img1)
+        if len(normalized_detections) > 0:         
+            detections = self.blaze_detector.denormalize_detections(normalized_detections,scale1,pad1)
+                
+            xc,yc,scale,theta = self.blaze_detector.detection2roi(detections)
+            roi_img,roi_affine,roi_box = self.blaze_landmark.extract_roi(img1,xc,yc,theta,scale)
+
+            flags, normalized_landmarks = self.blaze_landmark.predict(roi_img)
+            landmarks = self.blaze_landmark.denormalize_landmarks(normalized_landmarks, roi_affine)
+
+            keypoint_list = []
+            for i in range(len(flags)):
+                landmark, flag = landmarks[i], flags[i]
                 h, w, c = frame.shape
-                confidence = landmark.visibility
-                cx, cy = int(landmark.x * w), int(landmark.y*h)
-                keypoint_list.append([idx, cx, cy, confidence])
-        # print(keypoint_list)
+                confidence = 100 # landmark.visibility   # Not sure how to get visibility
+                for point in landmark[:,:2]:
+                    x,y = point
+                    cx, cy = int(x * w), int(y*h)
+                keypoint_list.append([flag, cx, cy, confidence])
+            # print(keypoint_list)
         return keypoint_list
 
 class Exercise:
