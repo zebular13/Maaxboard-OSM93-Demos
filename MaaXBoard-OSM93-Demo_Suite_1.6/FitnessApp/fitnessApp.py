@@ -75,12 +75,14 @@ class PoseDetector:
             for i in range(len(flags)):
                 landmark, flag = landmarks[i], flags[i]
                 h, w, c = frame.shape
-                confidence = 100 # landmark.visibility   # Not sure how to get visibility
-                for point in landmark[:,:2]:
+                confidence = 0.8 # landmark.visibility   # Not sure how to get visibility
+                points = landmark[:,:2]
+                points = points[:,:2]
+                for point in points:
                     x,y = point
                     cx, cy = int(x * w), int(y*h)
-                keypoint_list.append([flag, cx, cy, confidence])
-            ##print(keypoint_list)
+                    keypoint_list.append([flag, cx, cy, confidence])
+            print(keypoint_list)
         return keypoint_list
 
 class Exercise:

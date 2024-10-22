@@ -216,7 +216,7 @@ def index(request):
 
 camera = cameraSupport(HardwareSupport, frameCallback)
 
-window = localWindow(screenClickCallback)
+#window = localWindow(screenClickCallback)
 
 app.run(debug=True)
 
