@@ -2,35 +2,28 @@ import numpy as np
 
 from FitnessApp.blaze_common.blazebase import BlazeLandmarkBase
 
-#import tensorflow as tf
-bUseTfliteRuntime = False
-try:
-    import tensorflow as tf
-    import tensorflow.lite
-
-except:
-    from tflite_runtime.interpreter import Interpreter
-    bUseTfliteRuntime = True
-
 from timeit import default_timer as timer
 
 class BlazeLandmark(BlazeLandmarkBase):
-    def __init__(self,blaze_app="blazehandlandmark"):
+    def __init__(self,blaze_app="blazeposelandmark", delegate_path=None, run_on_hardware = False):
         super(BlazeLandmark, self).__init__()
 
         self.blaze_app = blaze_app
-
+        self.delegate_path = delegate_path
+        self.run_on_hardware = run_on_hardware
 
     def load_model(self, model_path):
 
-        if self.DEBUG:
-           print("q[BlazeLandmark.load_model] Model File : ",model_path)
-           
-        if bUseTfliteRuntime:
-            self.interp_landmark = Interpreter(model_path)
+        if self.run_on_hardware:
+            import tflite_runtime.interpreter as tflite
         else:
-            self.interp_landmark = tf.lite.Interpreter(model_path)
-
+            import tensorflow.lite as tflite
+           
+        if(self.delegate_path):
+            ext_delegate = [tflite.load_delegate(self.delegate_path)]
+            self.interp_landmark = tflite.Interpreter(model_path=model_path, experimental_delegates=ext_delegate)
+        else:
+            self.interp_landmark = tflite.Interpreter(model_path=model_path)
         self.interp_landmark.allocate_tensors()
 
         # reading tflite model paramteres

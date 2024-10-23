@@ -4,8 +4,9 @@ import threading
 import cv2
 import numpy as np
 # from PostureModel.posture_main import posture_core
+from FitnessApp.fitnessApp import FitnessAI
 from FitnessApp.fitnessApp import init_fitness_app
-from FitnessApp.fitnessApp import process_frame_fitness, reset_fitness_app
+from FitnessApp.fitnessApp import reset_fitness_app
 from dms.dms_manager import DMSManager
 
 init_fitness_app()
@@ -25,6 +26,9 @@ dms_npu = DMSManager(run_on_hardware=True, use_npu=True)
 
 dms_cpu = DMSManager(run_on_hardware=False, use_npu=False)
 dms_npu = DMSManager(run_on_hardware=False, use_npu=True)
+
+fitness_cpu = FitnessAI(run_on_hardware=False, use_npu=False)
+fitness_npu = FitnessAI(run_on_hardware=False, use_npu=True)
 
 class cameraSupport():
 	''' Class for managing camera functionality and callbacks with frame data.
@@ -140,10 +144,14 @@ class cameraSupport():
 
 						elif self.runningDemo == 0:
 							#Fitness app demo
-							newFrame, rom, _, repCount, name, status = process_frame_fitness(image)
-							self.frame = newFrame
-							self.callback(self.frame, 0, rom, repCount, name, status, 0)
-
+							if self.enableNPU == False:
+								newFrame, rom, _, repCount, name, status = fitness_cpu.process_frame_fitness(image)
+								self.frame = newFrame
+								self.callback(self.frame, 0, rom, repCount, name, status, 0)
+							else:
+								newFrame, rom, _, repCount, name, status = fitness_npu.process_frame_fitness(image)
+								self.frame = newFrame
+								self.callback(self.frame, 0, rom, repCount, name, status, 0)
 						else:
 							# CAN demo selected, ignore input stream
 							pass

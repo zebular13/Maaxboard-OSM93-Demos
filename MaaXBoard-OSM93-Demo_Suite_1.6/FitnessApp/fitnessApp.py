@@ -39,19 +39,20 @@ def init_fitness_app():
     fitness_app = FitnessAI()
 
 class PoseDetector:
-    def __init__(self):
-        # self.run_on_hardware = False
-        # self.use_npu = False
+    def __init__(self, run_on_hardware=False, use_npu=False):
+        self.run_on_hardware = run_on_hardware
+        self.use_npu = use_npu
         self.path_to_models = model_paths.MODEL_DIR
-        model_selector = model_paths.CPU_MODELS
+        model_selector = model_paths.NPU_MODELS if self.use_npu else model_paths.CPU_MODELS
+        DELEGATE_PATH = "/usr/lib/libethosu_delegate.so" if self.use_npu else None
 
-        self.blaze_detector = BlazeDetector("blazepose")
+        self.blaze_detector = BlazeDetector("blazepose", delegate_path=DELEGATE_PATH, run_on_hardware=self.run_on_hardware)
 
         self.blaze_detector.set_debug(False)
         self.blaze_detector.display_scores(False)
         self.blaze_detector.load_model(model_path = str(self.path_to_models + model_selector['DETECT_MODEL']))
 
-        self.blaze_landmark = BlazeLandmark("blazeposelandmark")
+        self.blaze_landmark = BlazeLandmark("blazeposelandmark", delegate_path=DELEGATE_PATH, run_on_hardware=self.run_on_hardware)
         self.blaze_landmark.set_debug(False)
         self.blaze_landmark.load_model(model_path=str((self.path_to_models + model_selector['LANDMARK_MODEL'])))
 
@@ -206,8 +207,10 @@ class Exercise:
         pass
 
 class FitnessAI:
-    def __init__(self):
-        self.pose_detector = PoseDetector()
+    def __init__(self, run_on_hardware=False, use_npu=False):
+        self.run_on_hardware = False
+        self.use_npu = False
+        self.pose_detector = PoseDetector(self.run_on_hardware, self.use_npu)
         self.exercises = [
             Exercise("Bicep Curls", BICEP_CURL_POINTS, BICEP_CURL_ANGLE_RANGE),
             # Exercise("Overhead Press", OVERHEAD_PRESSL_POINTS, OVERHEAD_PRESSL_ANGLE_RANGE),
@@ -258,11 +261,11 @@ class FitnessAI:
         return all(exercise.rep_count == 0 for exercise in self.exercises)
 
 
-def process_frame_fitness(image):
-    # image format when sending out - BGR
-    # print("Fitness App Image Shape: ", image.shape)
-    image_show, rom, set_count, rep_count, name, status = fitness_app.start(frame=image)
-    return image_show, rom, set_count, int(rep_count), name, status
+    def process_frame_fitness(self, image):
+        # image format when sending out - BGR
+        # print("Fitness App Image Shape: ", image.shape)
+        image_show, rom, set_count, rep_count, name, status = self.start(frame=image)
+        return image_show, rom, set_count, int(rep_count), name, status
 
 def reset_fitness_app():
     fitness_app.reset()

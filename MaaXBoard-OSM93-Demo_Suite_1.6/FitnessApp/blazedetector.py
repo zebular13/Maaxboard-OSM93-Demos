@@ -3,27 +3,34 @@ import numpy as np
 from FitnessApp.blaze_common.blazebase import BlazeDetectorBase
 
 #import tensorflow as tf
-import tensorflow.lite as tflite
+# import tensorflow.lite as tflite
 
 from timeit import default_timer as timer
 
-delegate_path = None
 
 class BlazeDetector(BlazeDetectorBase):
-    def __init__(self,blaze_app="blazepalm"):
+    def __init__(self,blaze_app="blazepose", delegate_path=None, run_on_hardware = False):
         super(BlazeDetector, self).__init__()
 
         self.blaze_app = blaze_app
         self.batch_size = 1
-        
+        self.delegate_path = delegate_path
+        self.run_on_hardware = run_on_hardware
 
-    def load_model(self, model_path="pose_detection_full_quant.tflite"):
+        
+    def load_model(self, model_path):
+
+        if self.run_on_hardware:
+            import tflite_runtime.interpreter as tflite
+        else:
+            import tensorflow.lite as tflite
+
 
         if self.DEBUG:
            print("q[BlazeDetector.load_model] Model File : ",model_path)
            
-        if(delegate_path):
-            ext_delegate = [tflite.load_delegate(delegate_path)]
+        if(self.delegate_path):
+            ext_delegate = [tflite.load_delegate(self.delegate_path)]
             self.interp_detector = tflite.Interpreter(model_path=model_path, experimental_delegates=ext_delegate)
         else:
             self.interp_detector = tflite.Interpreter(model_path=model_path)
