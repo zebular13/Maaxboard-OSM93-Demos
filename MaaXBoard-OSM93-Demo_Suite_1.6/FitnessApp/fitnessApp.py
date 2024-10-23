@@ -58,20 +58,28 @@ class PoseDetector:
     
     def detect_pose(self, frame):
         # Convert color BGR to RGB for inferencing
+        # BlazePose pipeline
+        start = timer()
+
         imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         img1,scale1,pad1=self.blaze_detector.resize_pad(imgRGB)
+        #profile_resize = timer()-start
 
         normalized_detections = self.blaze_detector.predict_on_image(img1)
-        if len(normalized_detections) > 0:         
+        if len(normalized_detections) > 0: 
+            start = timer() 
+
             detections = self.blaze_detector.denormalize_detections(normalized_detections,scale1,pad1)
                 
             xc,yc,scale,theta = self.blaze_detector.detection2roi(detections)
             roi_img,roi_affine,roi_box = self.blaze_landmark.extract_roi(imgRGB,xc,yc,theta,scale)
+            #profile_extract = timer()-start
 
             flags, normalized_landmarks = self.blaze_landmark.predict(roi_img)
+
+            #start = timer() 
             landmarks = self.blaze_landmark.denormalize_landmarks(normalized_landmarks, roi_affine)
 
-            #xmin, ymin =  roi_box[0:1]
             keypoint_list = []
             for i in range(len(flags)):
                 roi_box[i]
@@ -86,6 +94,10 @@ class PoseDetector:
                     #keypoint_list.append([i, cx + xmin, cy + ymin, confidence])
                     keypoint_list.append([i, cx, cy, confidence])
             #print(keypoint_list)
+            #profile_annotate = timer()-start
+           
+            inference_time = timer()-start
+            print("Inference time: ", inference_time)
         return keypoint_list
 
 class Exercise:
