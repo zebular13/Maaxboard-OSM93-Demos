@@ -1,7 +1,7 @@
 # Maaxboard-OSM93-Demos
 Demo Projects for MaaXBoard OSM93
 
-## MaaXBoard-OSM93-Demo_Suite_1.6
+## MaaXBoard OSM93 Demo Suite
 ### Overview
 Tria developed application suite to explore funtionality of the MaaXBoard OSM93. Multiple applications are included in this project folder including: Web server, CAN interface demo, AI Fitness Trainer, and Driver Monitoring system. 
 

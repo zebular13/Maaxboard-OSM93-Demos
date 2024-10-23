@@ -34,4 +34,3 @@ echo 7 > /proc/sys/kernel/printk
 systemctl enable autorun.service
 
 exit 0
-
