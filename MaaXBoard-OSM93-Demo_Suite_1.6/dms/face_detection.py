@@ -36,10 +36,12 @@ class FaceDetector:
     
         self.inference_logger = InferenceTimeLogger()
         
-        if run_on_hardware:
-            import tflite_runtime.interpreter as tflite
-        else:
-            import tensorflow.lite as tflite
+        import tflite_runtime.interpreter as tflite
+
+        # if run_on_hardware:
+        #     import tflite_runtime.interpreter as tflite
+        # else:
+        #     import tensorflow.lite as tflite
 
         if(delegate_path):
             ext_delegate = [tflite.load_delegate(delegate_path)]

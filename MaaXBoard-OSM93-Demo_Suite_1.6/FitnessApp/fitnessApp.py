@@ -39,7 +39,7 @@ def init_fitness_app():
     fitness_app = FitnessAI()
 
 class PoseDetector:
-    def __init__(self, run_on_hardware=False, use_npu=False):
+    def __init__(self, run_on_hardware, use_npu):
         self.run_on_hardware = run_on_hardware
         self.use_npu = use_npu
         self.path_to_models = model_paths.MODEL_DIR
@@ -207,10 +207,8 @@ class Exercise:
         pass
 
 class FitnessAI:
-    def __init__(self, run_on_hardware=False, use_npu=False):
-        self.run_on_hardware = False
-        self.use_npu = False
-        self.pose_detector = PoseDetector(self.run_on_hardware, self.use_npu)
+    def __init__(self, run_on_hardware=True, use_npu=True):
+        self.pose_detector = PoseDetector(run_on_hardware, use_npu)
         self.exercises = [
             Exercise("Bicep Curls", BICEP_CURL_POINTS, BICEP_CURL_ANGLE_RANGE),
             # Exercise("Overhead Press", OVERHEAD_PRESSL_POINTS, OVERHEAD_PRESSL_ANGLE_RANGE),

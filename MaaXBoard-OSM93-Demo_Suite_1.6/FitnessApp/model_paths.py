@@ -22,6 +22,8 @@ Previous A0 silicon did not require setting Ethos-U delegate to invoke the NPU. 
 '''
 
 NPU_MODELS = {
-    'DETECT_MODEL': 'pose_detection_128x128_full_integer_quant_vela.tflite',
-    'LANDMARK_MODEL': 'pose_landmark_upper_body_256x256_full_integer_quant_vela.tflite'
+    # 'DETECT_MODEL': 'pose_detection_128x128_full_integer_quant_vela.tflite',
+    # 'LANDMARK_MODEL': 'pose_landmark_upper_body_256x256_full_integer_quant_vela.tflite'
+    'DETECT_MODEL': 'pose_detection_full_quant_vela.tflite',
+    'LANDMARK_MODEL': 'pose_landmark_full_quant_vela.tflite'
 }

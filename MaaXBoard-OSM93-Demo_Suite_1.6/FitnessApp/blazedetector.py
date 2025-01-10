@@ -2,14 +2,13 @@ import numpy as np
 
 from FitnessApp.blaze_common.blazebase import BlazeDetectorBase
 
-#import tensorflow as tf
 # import tensorflow.lite as tflite
 
 from timeit import default_timer as timer
 
 
 class BlazeDetector(BlazeDetectorBase):
-    def __init__(self,blaze_app="blazepose", delegate_path=None, run_on_hardware = False):
+    def __init__(self,blaze_app="blazepose", delegate_path=None, run_on_hardware=True):
         super(BlazeDetector, self).__init__()
 
         self.blaze_app = blaze_app
