@@ -370,7 +370,7 @@ class BlazeDetectorBase(BlazeBase):
         """
         if len(detections) == 0: 
            return []
-        elif len(detections) > 3:
+        elif len(detections) >= 1:
            detections = detections[:10]
         #print(detections[0])
         output_detections = []
